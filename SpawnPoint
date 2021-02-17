@@ -1,0 +1,20 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class SpawnPoint : MonoBehaviour
+{
+    public Transform pointGrid;
+    public int score { get; set; } = 0;
+
+    private void Awake()
+    {
+        gameObject.transform.Translate(Random.Range(-10,10), Random.Range(-8,8),0);
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        Debug.Log(collision.gameObject.tag);
+        gameObject.transform.position = new Vector3(Random.Range(-20, 20), Random.Range(-8, 8),0);
+        score += 10;
+    }
+}
