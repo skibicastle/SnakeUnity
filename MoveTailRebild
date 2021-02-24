@@ -1,0 +1,61 @@
+using System.Collections;
+using System.Linq;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Tail : MonoBehaviour
+{
+    public GameObject tailPrefab;
+    List<Transform> tail = new List<Transform>();
+    public float score;
+    float time
+    {
+        get 
+        { 
+            return time; 
+        }
+        set 
+        {
+            if (score == time)
+            value = score / 10;
+            time = value;
+        }
+    }
+    void Update()
+    {
+        InvokeRepeating("Move", time, time);
+    }
+    void Move()
+    {
+        // Save current position (gap will be here)
+        Vector2 beforePosition = transform.position;
+
+        // Move head into new direction (now there is a gap)
+        transform.Translate(dir);
+
+        // Ate something? Then insert new Element into gap
+        if (ate)
+        {
+            // Load Prefab into the world
+            GameObject g = (GameObject)Instantiate(tailPrefab,
+                                                  beforePosition,
+                                                  Quaternion.identity);
+
+            // Keep track of it in our tail list
+            tail.Insert(0, g.transform);
+
+            // Reset the flag
+            ate = false;
+        }
+        // Do we have a Tail?
+        else if (tail.Count > 0)
+        {
+            // Move last Tail Element to where the Head was
+            tail.Last().position = beforePosition;
+
+            // Add to front of list, remove from the back
+            tail.Insert(0, tail.Last());
+            tail.RemoveAt(tail.Count - 1);
+        }
+    }
+}
