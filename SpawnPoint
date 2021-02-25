@@ -1,20 +1,73 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SpawnPoint : MonoBehaviour
 {
     public Transform pointGrid;
+    public Sprite[] spriteFood = new Sprite[16];
+    private IEnumerator SpawnBigPoint;
+    private Collider2D collisionBigPoint = null;
+    bool taimerStart = false;
+    int scoreBigPoint = 20;
+    public bool startAnimation { get; set; } = false;
     public int score { get; set; } = 0;
 
     private void Awake()
     {
         gameObject.transform.Translate(Random.Range(-10,10), Random.Range(-8,8),0);
     }
+    void Update()
+    {
+
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log(collision.gameObject.tag);
-        gameObject.transform.position = new Vector3(Random.Range(-20, 20), Random.Range(-8, 8),0);
-        score += 10;
+        if (collision.tag == "snake")
+        {
+            if (taimerStart)
+                collisionBigPoint = collision;
+
+            const int scoreUpdate = 10;
+            score += scoreUpdate;
+            if (score == scoreBigPoint)
+            {
+                const int TIME = 11;
+                scoreBigPoint += 100;
+                startAnimation = true;
+                SpawnBigPoint = Taimer(TIME);
+                StartCoroutine(SpawnBigPoint);
+            }
+            else
+            {
+                SpawnFood();
+            }
+            
+        }
+
+    }
+    private void SpawnFood()
+    {
+        gameObject.GetComponent<SpriteRenderer>().sprite = spriteFood[Random.Range(0, 16)];
+        gameObject.transform.localScale = new Vector3(1f, 1f, 0);
+        gameObject.transform.position = new Vector3(Random.Range(-16, 16), Random.Range(-8, 8), 0);
+    }
+    private IEnumerator Taimer(int time)
+    {
+        taimerStart = true;
+        Debug.Log("1 СТАДИЯ ДО 10 СЕК");
+        const int scoreUpdate = 10;
+        gameObject.GetComponent<SpriteRenderer>().sprite = spriteFood[3];
+        gameObject.transform.localScale = new Vector3(3, 3, 0);
+        gameObject.transform.position = new Vector3(Random.Range(-16, 16), Random.Range(-5, 5), 0);
+        if (collisionBigPoint.tag == "snake")
+        {
+            Debug.Log("2 СТАДИЯ ДО 10 СЕК СЪЕЛ");
+            score += scoreUpdate;
+            startAnimation = false;
+            yield break;
+        }
+        yield return new WaitForSeconds(time);
+        Debug.Log("2 СТАДИЯ ПОСЛЕ 10 СЕК");
+        SpawnFood();
     }
 }
